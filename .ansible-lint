@@ -1,0 +1,10 @@
+enable_list:
+  - fqcn-builtins
+  - no-log-password
+  - no-same-owner
+warn_list: []
+skip_list:
+  - meta-incorrect
+  - meta-no-info
+  - role-name
+  - no-free-form

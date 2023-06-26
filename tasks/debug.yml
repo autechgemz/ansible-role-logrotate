@@ -1,0 +1,16 @@
+---
+
+- name: Debug tasks
+  tags:
+    - logrotate_config
+    - logrotate
+  block:
+    - name: Debug variables
+      when: logrotate_debug is defined and logrotate_debug
+      block:
+        - name: Debug logrotate_dropin_before
+          ansible.builtin.debug: var=logrotate_dropin_before
+        - name: Debug logrotate_dropin_after
+          ansible.builtin.debug: var=logrotate_dropin_after
+        - name: Debug logrotate_dropin_remove
+          ansible.builtin.debug: var=logrotate_dropin_remove

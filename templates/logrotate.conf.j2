@@ -1,0 +1,6 @@
+# {{ ansible_managed }}
+{% if logrotate_global_config_options is defined and logrotate_global_config_options %}
+{% for line in logrotate_global_config_options %}
+{{ line }}
+{% endfor %}
+{% endif %}

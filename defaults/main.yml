@@ -1,0 +1,11 @@
+---
+
+logrotate_debug: false
+
+logrotate_package_ensure: 'present'
+
+logrotate_global_config_options: []
+
+logrotate_dropin_config_purge: false
+
+logrotate_dropin_config_options: []

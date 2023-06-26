@@ -1,0 +1,72 @@
+---
+
+- name: Dropin config tasks
+  become: true
+  tags:
+    - logrotate_config
+    - logrotate
+  block:
+    - name: Config logrotate directory
+      ansible.builtin.file:
+        path: "{{ logrotate_dropin_config_dir }}"
+        owner: root
+        group: root
+        mode: 0755
+        state: directory
+
+    - name: Purge dropin config
+      when:
+        - logrotate_dropin_config_options is defined and logrotate_dropin_config_options
+        - logrotate_dropin_config_purge is defined and logrotate_dropin_config_purge
+      block:
+        - name: Search dropin config
+          ansible.builtin.find:
+            paths: "{{ logrotate_dropin_config_dir }}"
+            patterns: "*"
+          register: findlist
+
+        - name: Current dropin config
+          ansible.builtin.set_fact:
+            logrotate_dropin_before: "{{ findlist['files'] | map(attribute='path') | flatten }}"
+
+        - name: Generate dropin config
+          ansible.builtin.set_fact:
+            logrotate_dropin_after: "{{ logrotate_dropin_after | default([]) + [ logrotate_dropin_config_dir + '/' + item.name ] | flatten }}"
+          with_items: "{{ logrotate_dropin_config_options }}"
+
+        - name: Remove target dropin config
+          ansible.builtin.set_fact:
+            logrotate_dropin_remove: "{{ logrotate_dropin_before | difference(logrotate_dropin_after) }}"
+
+        - name: Dropin tasks
+          ansible.builtin.include_tasks: debug.yml
+          when: logrotate_debug is defined and logrotate_debug
+
+        - name: Remove dropin config
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          when: logrotate_dropin_remove is defined
+          with_items: "{{ logrotate_dropin_remove }}"
+
+    - name: Manage logrotate dropin config file
+      when:
+        - logrotate_dropin_config_options is defined and logrotate_dropin_config_options
+        - item.state is defined and item.state == 'present' or item.state is undefined 
+      ansible.builtin.template:
+        src: logrotate_dropin.conf.j2
+        dest: "{{ logrotate_dropin_config_dir }}/{{ item.name }}"
+        owner: root
+        group: root
+        mode: 0644
+      with_items: "{{ logrotate_dropin_config_options }}"
+
+    - name: Remove dropin config
+      when:
+        - logrotate_dropin_config_options is defined and logrotate_dropin_config_options
+        - item.state is defined and item.state == 'absent'
+        - logrotate_dropin_config_purge is undefined or not logrotate_dropin_config_purge
+      ansible.builtin.file:
+        path: "{{ logrotate_dropin_config_dir }}/{{ item.name }}"
+        state: absent
+      with_items: "{{ logrotate_dropin_config_options }}"

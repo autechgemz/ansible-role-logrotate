@@ -1,0 +1,21 @@
+---
+
+- name: Logrotate tasks
+  tags:
+    - logrotate_install
+    - logrotate_config
+    - logrotate
+  block:
+    - name: Set OS family dependency variables
+      ansible.builtin.include_vars: "{{ item }}"
+      loop:
+        - "{{ ansible_os_family }}.yml"
+    - name: Install tasks
+      ansible.builtin.import_tasks: install.yml
+    - name: Config tasks
+      ansible.builtin.import_tasks: config.yml
+  rescue:
+    - name: Print Error
+      ansible.builtin.debug:
+        msg: "Unsupport platform or error occurred due to some reason."
+      failed_when: true

@@ -1,0 +1,7 @@
+---
+
+logrotate_package_name: 'logrotate'
+
+logrotate_global_config_file: '/etc/logrotate.conf'
+
+logrotate_dropin_config_dir: '/etc/logrotate.d'

@@ -1,0 +1,21 @@
+---
+
+- name: Install tasks
+  become: true
+  tags:
+    - logrotate_install
+    - logrotate
+  block:
+    - name: Install logrotate package
+      when: ansible_os_family == 'Debian'
+      ansible.builtin.apt:
+        name: ["{{ item }}"]
+        update_cache: true
+        state: "{{ logrotate_package_ensure }}"
+      with_items: "{{ logrotate_package_name }}"
+    - name: Install logrotate package
+      when: ansible_os_family == 'RedHat'
+      ansible.builtin.yum:
+        name: ["{{ item }}"]
+        state: "{{ logrotate_package_ensure }}"
+      with_items: "{{ logrotate_package_name }}"

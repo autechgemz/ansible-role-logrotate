@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+{% for lines in item.targets %}
+{{ lines }}
+{% endfor %}
+{
+{% for optline in item.options %}
+  {{ optline }}
+{% endfor %}
+}
